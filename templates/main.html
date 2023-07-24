@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+    <title>Title</title>
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="mb-4">Upload and Process Audio</h1>
+    <form method="post" enctype="multipart/form-data" class="mb-4">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.original_audio.label_tag }}
+            {{ form.original_audio }}
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Original Audio</h2>
+            <audio controls>
+                <source src="{{ audio_data.original_audio.url }}" type="audio/wav">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Original Text</h2>
+            <p class="card-text">{{ audio_data.original_text }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Processed Audio</h2>
+            <audio controls>
+                <source src="{{ audio_data.processed_audio.url }}" type="audio/wav">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Processed Text</h2>
+            <p class="card-text">{{ audio_data.processed_text }}</p>
+        </div>
+    </div>
+
+</body>
+</html>
