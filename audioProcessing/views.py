@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from .forms import AudioForm
 from django.utils import timezone
 from .utils import *
@@ -12,6 +12,15 @@ def main(request):
     if request.method == 'POST':
         form = AudioForm(request.POST, request.FILES)
         if form.is_valid():
+            '''
+            if not request.FILES['original_audio']:
+                # 텍스트만 input -> 번역 -> tts
+            elif not request.POST['original_text']:
+                # 오디오만 input -> 인식 -> 번역 -> tts
+            else:
+                # 둘 다 input -> ??
+            '''
+
             audio_data = form.save(commit=False)
             audio_data.create_date = timezone.now()
             audio_file = request.FILES['original_audio']

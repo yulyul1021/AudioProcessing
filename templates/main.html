@@ -7,17 +7,63 @@
     <title>Title</title>
 </head>
 <body>
-<div class="container mt-5">
-    <h1 class="mb-4">Upload and Process Audio</h1>
-    <form method="post" enctype="multipart/form-data" class="mb-4">
+<div class="container my-5">
+    <h1 class="mb-5">Process Audio</h1>
+
+    <form method="post" enctype="multipart/form-data" class="my-5">
         {% csrf_token %}
-        <div class="form-group">
-            {{ form.original_audio.label_tag }}
-            {{ form.original_audio }}
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Upload Audio</h5>
+                        <!--오디오 파일 업로드-->
+                        <div class="form-group my-5">
+                            {{ form.original_audio }}
+                        </div>
+                        <!--오디오 파일 업로드 끝-->
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Record Audio</h5>
+                        <!--녹음-->
+                        <div class="my-5">
+                            <button type="button" class="btn btn-primary me-2" id="recordingStart">Start Recording
+                            </button>
+                            <button type="button" class="btn btn-danger" id="recordingStop" disabled>Stop Recording
+                            </button>
+
+                            <audio id="audio" controls class="w-100 mt-3" style=""></audio>
+                        </div>
+                        <!--녹음 끝-->
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Enter Text</h5>
+                        <!-- Text 입력 폼 -->
+                        <div class="form-group my-5" id="textForm">
+                            <textarea class="form-control" id="inputText" rows="3"
+                                      placeholder="Enter text here..."></textarea>
+                        </div>
+                        <!-- Text 입력 폼 끝 -->
+                    </div>
+                </div>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">Upload</button>
+        <button type="submit" class="btn btn-primary mt-3">Input</button>
     </form>
 
+    <!-- 구분선 -->
+    <hr class="mb-5">
+    <!-- 구분선 끝 -->
+
+    <!--원본 오디오 재생-->
     <div class="card mb-4">
         <div class="card-body">
             <h2 class="card-title">Original Audio</h2>
@@ -27,14 +73,18 @@
             </audio>
         </div>
     </div>
+    <!--원본 오디오 재생 끝-->
 
+    <!--원본 텍스트-->
     <div class="card mb-4">
         <div class="card-body">
             <h2 class="card-title">Original Text</h2>
             <p class="card-text">{{ audio_data.original_text }}</p>
         </div>
     </div>
+    <!--원본 텍스트 끝-->
 
+    <!--가공 후 오디오 재생-->
     <div class="card mb-4">
         <div class="card-body">
             <h2 class="card-title">Processed Audio</h2>
@@ -44,13 +94,77 @@
             </audio>
         </div>
     </div>
+    <!--가공 후 오디오 끝-->
 
-    <div class="card">
+    <!--가공 후 텍스트-->
+    <div class="card mb-4">
         <div class="card-body">
             <h2 class="card-title">Processed Text</h2>
             <p class="card-text">{{ audio_data.processed_text }}</p>
         </div>
     </div>
+    <!--가공 후 텍스트 끝-->
+</div>
 
+<script src="{% static 'bootstrap.min.js' %}"></script>
+<script>
+
+  const startButton = document.getElementById('recordingStart');
+  const stopButton = document.getElementById('recordingStop');
+  const audioElement = document.getElementById('audio');
+
+  let mediaRecorder;
+  let audioChunks = []; // 녹음 데이터 저장 배열
+
+  async function startRecording() {
+    try {
+
+      // 마이크 mediaStream 생성: Promise를 반환하므로 async/await 사용
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // MediaRecorder 생성
+      mediaRecorder = new MediaRecorder(stream);
+
+      // 이벤트핸들러: 녹음 데이터 취득 처리
+      mediaRecorder.ondataavailable = event => {
+        audioChunks.push(event.data);   // 오디오 데이터가 취득될 때마다 배열에 담아둠
+      };
+
+      // 이벤트핸들러: 녹음 종료 처리 & 재생하기
+      mediaRecorder.onstop = () => {
+        // 녹음이 종료되면, 배열에 담긴 오디오 데이터(Blob)들을 합친다: 코덱도 설정해준다.
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        // Blob 데이터에 접근할 수 있는 주소를 생성한다.
+        const audioUrl = URL.createObjectURL(audioBlob);
+        // audio엘리먼트로 재생한다.
+        audioElement.src = audioUrl;
+      };
+
+      mediaRecorder.start();
+      startButton.disabled = true;
+      stopButton.disabled = false;
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+      startButton.disabled = false;
+      stopButton.disabled = true;
+    }
+  }
+
+  startButton.addEventListener('click', startRecording);
+  stopButton.addEventListener('click', stopRecording);
+
+
+
+
+
+
+
+
+</script>
 </body>
 </html>
