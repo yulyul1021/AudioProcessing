@@ -21,7 +21,7 @@ def main(request):
                 en_text = text_translate(kr_text)
                 audio_data.processed_text = en_text
 
-                # tts wav file create
+                # tts wav file create and save
                 tts_file = text_to_tts(en_text)
                 audio_data.processed_audio.save(f'temp{audio_data.pk}.wav', tts_file)
 
@@ -33,14 +33,17 @@ def main(request):
                 audio_file = request.FILES['original_audio']
 
                 # 녹음으로 들어왔을때 데이터 변환
+                '''
                 if isinstance(audio_file, InMemoryUploadedFile):
+                    print("*****")
                     wav_file = request.FILES['original_audio'].file
                     audio_data.original_audio.save(audio_file.name, wav_file) # 정상적으로 저장 및 재생됨
                     audio_file = wav_file
                 #
+                '''
 
                 # 한국어 음성 -> 텍스트 변환
-                kr_text = audio_to_text(audio_file)
+                kr_text = audio_to_text(audio_file) # 녹음된 파일일시 해당 함수에서 오류
                 audio_data.original_text = kr_text
 
                 # 한 -> 영 텍스트 번역
