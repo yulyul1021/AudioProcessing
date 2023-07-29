@@ -10,7 +10,7 @@
 <div class="container my-5">
     <h1 class="mb-5">Process Audio</h1>
 
-    <form method="post" enctype="multipart/form-data" class="my-5">
+    <form method="post" id="upload_form" enctype="multipart/form-data" class="my-5">
         {% csrf_token %}
         <div class="row">
             <div class="col-sm-4">
@@ -18,8 +18,9 @@
                     <div class="card-body">
                         <h5 class="card-title">Upload Audio</h5>
                         <!--오디오 파일 업로드-->
-                        <div class="form-group my-5">
-                            {{ form.original_audio }}
+                        <div class="form-group my-5" name="original_audio" id="original_audio">
+                            <input type="file" id="file_input" name="{{ form.original_audio.name }}"
+                                   accept="audio/wav"/>
                         </div>
                         <!--오디오 파일 업로드 끝-->
                     </div>
@@ -31,9 +32,12 @@
                         <h5 class="card-title">Record Audio</h5>
                         <!--녹음-->
                         <div class="my-5">
-                            <button type="button" class="btn btn-primary me-2" id="recordingStart">Start Recording
+                            <button type="button" class="btn btn-success" id="recordingStart">Start Recording
                             </button>
                             <button type="button" class="btn btn-danger" id="recordingStop" disabled>Stop Recording
+                            </button>
+                            <button type="button" class="btn btn-primary" id="recordingUpload" onclick="setBlob()"
+                                    disabled>Upload
                             </button>
 
                             <audio id="audio" controls class="w-100 mt-3" style=""></audio>
@@ -48,7 +52,7 @@
                         <h5 class="card-title">Enter Text</h5>
                         <!-- Text 입력 폼 -->
                         <div class="form-group my-5" id="textForm">
-                            <textarea class="form-control" id="inputText" rows="3"
+                            <textarea class="form-control" name="original_text" id="original_text" rows="3"
                                       placeholder="Enter text here..."></textarea>
                         </div>
                         <!-- Text 입력 폼 끝 -->
@@ -64,6 +68,7 @@
     <!-- 구분선 끝 -->
 
     <!--원본 오디오 재생-->
+    {% if audio_data.original_audio %}
     <div class="card mb-4">
         <div class="card-body">
             <h2 class="card-title">Original Audio</h2>
@@ -73,15 +78,18 @@
             </audio>
         </div>
     </div>
+    {% endif %}
     <!--원본 오디오 재생 끝-->
 
     <!--원본 텍스트-->
+    {% if audio_data.original_text %}
     <div class="card mb-4">
         <div class="card-body">
             <h2 class="card-title">Original Text</h2>
             <p class="card-text">{{ audio_data.original_text }}</p>
         </div>
     </div>
+    {% endif %}
     <!--원본 텍스트 끝-->
 
     <!--가공 후 오디오 재생-->
@@ -111,8 +119,10 @@
 
   const startButton = document.getElementById('recordingStart');
   const stopButton = document.getElementById('recordingStop');
+  const uploadButton = document.getElementById('recordingUpload');
   const audioElement = document.getElementById('audio');
 
+  let audioBlob;
   let mediaRecorder;
   let audioChunks = []; // 녹음 데이터 저장 배열
 
@@ -132,10 +142,13 @@
       // 이벤트핸들러: 녹음 종료 처리 & 재생하기
       mediaRecorder.onstop = () => {
         // 녹음이 종료되면, 배열에 담긴 오디오 데이터(Blob)들을 합친다: 코덱도 설정해준다.
-        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        audioChunks.splice(0); // 기존 오디오 데이터들은 모두 비워 초기화한다.
+
         // Blob 데이터에 접근할 수 있는 주소를 생성한다.
         const audioUrl = URL.createObjectURL(audioBlob);
-        // audio엘리먼트로 재생한다.
+
+        // audio 엘리먼트로 재생한다.
         audioElement.src = audioUrl;
       };
 
@@ -152,17 +165,24 @@
       mediaRecorder.stop();
       startButton.disabled = false;
       stopButton.disabled = true;
+      uploadButton.disabled = false;
     }
   }
 
+  function setBlob() {
+    let fileInputElement = document.getElementById('file_input');
+    let container = new DataTransfer();
+    let file = new File([audioBlob], "recordingFile.wav", {
+        type: "audio/wav",
+        lastModified: new Date().getTime()
+    });
+    container.items.add(file);
+
+    fileInputElement.files = container.files;
+}
+
   startButton.addEventListener('click', startRecording);
   stopButton.addEventListener('click', stopRecording);
-
-
-
-
-
-
 
 
 </script>

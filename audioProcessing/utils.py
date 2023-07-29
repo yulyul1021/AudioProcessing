@@ -15,7 +15,7 @@ def audio_to_text(audio):
     """
     r = sr.Recognizer()
     read_audio = sr.AudioFile(audio)
-    with read_audio as source:
+    with read_audio as source:  # 녹음 wav일시 오류
         f = r.record(source)
     out_text = r.recognize_google(f, language="ko-KR")
     return out_text
@@ -59,6 +59,6 @@ def rename_audio_file(pk, audio_data, audio_type):
     if audio_type == 'processed':
         audio_data.name = f"processed/{pk}_processed.wav"
     else:
-        audio_data.name = f"original/{pk}.wav"
+        audio_data.name = f"original/{pk}_original.wav"
     new_path = settings.MEDIA_ROOT / audio_data.name
     os.rename(initial_path, new_path)
