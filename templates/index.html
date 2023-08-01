@@ -142,7 +142,7 @@
       // 이벤트핸들러: 녹음 종료 처리 & 재생하기
       mediaRecorder.onstop = () => {
         // 녹음이 종료되면, 배열에 담긴 오디오 데이터(Blob)들을 합친다: 코덱도 설정해준다.
-        audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        audioBlob = new Blob(audioChunks, { type: 'video/webm' });
         audioChunks.splice(0); // 기존 오디오 데이터들은 모두 비워 초기화한다.
 
         // Blob 데이터에 접근할 수 있는 주소를 생성한다.
@@ -172,8 +172,8 @@
   function setBlob() {
     let fileInputElement = document.getElementById('file_input');
     let container = new DataTransfer();
-    let file = new File([audioBlob], "recordingFile.wav", {
-        type: "audio/wav",
+    let file = new File([audioBlob], "recordingFile.webm", {
+        type: "video/webm",
         lastModified: new Date().getTime()
     });
     container.items.add(file);
