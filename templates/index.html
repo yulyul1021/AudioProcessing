@@ -1,189 +1,231 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
     <title>Title</title>
 </head>
+
 <body>
-<div class="container my-5">
-    <h1 class="mb-5">Process Audio</h1>
+    <div class="container my-5">
+        <h1 class="mb-5">Process Audio</h1>
 
-    <form method="post" id="upload_form" enctype="multipart/form-data" class="my-5">
-        {% csrf_token %}
-        <div class="row">
-            <div class="col-sm-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Upload Audio</h5>
-                        <!--오디오 파일 업로드-->
-                        <div class="form-group my-5" name="original_audio" id="original_audio">
-                            <input type="file" id="file_input" name="{{ form.original_audio.name }}"
-                                   accept="audio/wav"/>
+        <form method="post" id="upload_form" enctype="multipart/form-data" class="my-5">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Upload Audio</h5>
+                            <!--오디오 파일 업로드-->
+                            <div class="form-group my-5" name="original_audio" id="original_audio">
+                                <input type="file" id="file_input" name="{{ form.original_audio.name }}"
+                                    accept="audio/wav" />
+                            </div>
+                            <!--오디오 파일 업로드 끝-->
                         </div>
-                        <!--오디오 파일 업로드 끝-->
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Record Audio</h5>
-                        <!--녹음-->
-                        <div class="my-5">
-                            <button type="button" class="btn btn-success" id="recordingStart">Start Recording
-                            </button>
-                            <button type="button" class="btn btn-danger" id="recordingStop" disabled>Stop Recording
-                            </button>
-                            <button type="button" class="btn btn-primary" id="recordingUpload" onclick="setBlob()"
+                <div class="col-sm-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Record Audio</h5>
+                            <!--녹음-->
+                            <div class="my-5">
+                                <button type="button" class="btn btn-success" id="recordingStart">Start Recording
+                                </button>
+                                <button type="button" class="btn btn-danger" id="recordingStop" disabled>Stop Recording
+                                </button>
+                                <button type="button" class="btn btn-primary" id="recordingUpload" onclick="setBlob()"
                                     disabled>Upload
-                            </button>
+                                </button>
 
-                            <audio id="audio" controls class="w-100 mt-3" style=""></audio>
+                                <audio id="playAudio" controls class="w-100 mt-3" style=""></audio>
+                            </div>
+                            <!--녹음 끝-->
                         </div>
-                        <!--녹음 끝-->
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Enter Text</h5>
+                            <!-- Text 입력 폼 -->
+                            <div class="form-group my-5" id="textForm">
+                                <textarea class="form-control" name="original_text" id="original_text" rows="3"
+                                    placeholder="Enter text here..."></textarea>
+                            </div>
+                            <!-- Text 입력 폼 끝 -->
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Enter Text</h5>
-                        <!-- Text 입력 폼 -->
-                        <div class="form-group my-5" id="textForm">
-                            <textarea class="form-control" name="original_text" id="original_text" rows="3"
-                                      placeholder="Enter text here..."></textarea>
-                        </div>
-                        <!-- Text 입력 폼 끝 -->
-                    </div>
-                </div>
+            <button type="submit" class="btn btn-primary mt-3">Input</button>
+        </form>
+
+        <!-- 구분선 -->
+        <hr class="mb-5">
+        <!-- 구분선 끝 -->
+
+        <!--원본 오디오 재생-->
+        {% if audio_data.original_audio %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Original Audio</h2>
+                <audio controls>
+                    <source src="{{ audio_data.original_audio.url }}" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Input</button>
-    </form>
+        {% endif %}
+        <!--원본 오디오 재생 끝-->
 
-    <!-- 구분선 -->
-    <hr class="mb-5">
-    <!-- 구분선 끝 -->
-
-    <!--원본 오디오 재생-->
-    {% if audio_data.original_audio %}
-    <div class="card mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Original Audio</h2>
-            <audio controls>
-                <source src="{{ audio_data.original_audio.url }}" type="audio/wav">
-                Your browser does not support the audio element.
-            </audio>
+        <!--원본 텍스트-->
+        {% if audio_data.original_text %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Original Text</h2>
+                <p class="card-text">{{ audio_data.original_text }}</p>
+            </div>
         </div>
-    </div>
-    {% endif %}
-    <!--원본 오디오 재생 끝-->
+        {% endif %}
+        <!--원본 텍스트 끝-->
 
-    <!--원본 텍스트-->
-    {% if audio_data.original_text %}
-    <div class="card mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Original Text</h2>
-            <p class="card-text">{{ audio_data.original_text }}</p>
+        <!--가공 후 오디오 재생-->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Processed Audio</h2>
+                <audio controls>
+                    <source src="{{ audio_data.processed_audio.url }}" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
         </div>
-    </div>
-    {% endif %}
-    <!--원본 텍스트 끝-->
+        <!--가공 후 오디오 끝-->
 
-    <!--가공 후 오디오 재생-->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Processed Audio</h2>
-            <audio controls>
-                <source src="{{ audio_data.processed_audio.url }}" type="audio/wav">
-                Your browser does not support the audio element.
-            </audio>
+        <!--가공 후 텍스트-->
+        {% if audio_data.processed_text %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Processed Text</h2>
+                <p class="card-text">{{ audio_data.processed_text }}</p>
+            </div>
         </div>
+        {% endif %}
+        <!--가공 후 텍스트 끝-->
     </div>
-    <!--가공 후 오디오 끝-->
 
-    <!--가공 후 텍스트-->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Processed Text</h2>
-            <p class="card-text">{{ audio_data.processed_text }}</p>
-        </div>
-    </div>
-    <!--가공 후 텍스트 끝-->
-</div>
+    <script src="{% static 'bootstrap.min.js' %}"></script>
+    <script src="{% static 'recorder.js' %}"></script>
+    <script>
+        //
+        //webkitURL is deprecated but nevertheless
+        URL = window.URL || window.webkitURL;
 
-<script src="{% static 'bootstrap.min.js' %}"></script>
-<script>
+        var gumStream;              //stream from getUserMedia()
+        var rec;                    //Recorder.js object
+        var input;                  //MediaStreamAudioSourceNode we'll be recording
 
-  const startButton = document.getElementById('recordingStart');
-  const stopButton = document.getElementById('recordingStop');
-  const uploadButton = document.getElementById('recordingUpload');
-  const audioElement = document.getElementById('audio');
+        // shim for AudioContext when it's not avb.
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        var audioContext //new audio context to help us record
 
-  let audioBlob;
-  let mediaRecorder;
-  let audioChunks = []; // 녹음 데이터 저장 배열
 
-  async function startRecording() {
-    try {
+        const startButton = document.getElementById('recordingStart');
+        const stopButton = document.getElementById('recordingStop');
+        const uploadButton = document.getElementById('recordingUpload');
+        const audioElement = document.getElementById('playAudio');
 
-      // 마이크 mediaStream 생성: Promise를 반환하므로 async/await 사용
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      // MediaRecorder 생성
-      mediaRecorder = new MediaRecorder(stream);
+        let audioBlob;
 
-      // 이벤트핸들러: 녹음 데이터 취득 처리
-      mediaRecorder.ondataavailable = event => {
-        audioChunks.push(event.data);   // 오디오 데이터가 취득될 때마다 배열에 담아둠
-      };
+        function startRecording() {
+            console.log("recordButton clicked");
 
-      // 이벤트핸들러: 녹음 종료 처리 & 재생하기
-      mediaRecorder.onstop = () => {
-        // 녹음이 종료되면, 배열에 담긴 오디오 데이터(Blob)들을 합친다: 코덱도 설정해준다.
-        audioBlob = new Blob(audioChunks, { type: 'video/webm' });
-        audioChunks.splice(0); // 기존 오디오 데이터들은 모두 비워 초기화한다.
+            // Disable the record button until we get a success or fail from getUserMedia()
+            startButton.disabled = true;
+            stopButton.disabled = false;
 
-        // Blob 데이터에 접근할 수 있는 주소를 생성한다.
-        const audioUrl = URL.createObjectURL(audioBlob);
+            navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(function (stream) {
+                console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
 
-        // audio 엘리먼트로 재생한다.
-        audioElement.src = audioUrl;
-      };
+                audioContext = new AudioContext({ sampleRate: 44100 });
 
-      mediaRecorder.start();
-      startButton.disabled = true;
-      stopButton.disabled = false;
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
-    }
-  }
+                // assign to gumStream for later use
+                gumStream = stream;
 
-  function stopRecording() {
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop();
-      startButton.disabled = false;
-      stopButton.disabled = true;
-      uploadButton.disabled = false;
-    }
-  }
+                // use the stream
+                input = audioContext.createMediaStreamSource(stream);
 
-  function setBlob() {
-    let fileInputElement = document.getElementById('file_input');
-    let container = new DataTransfer();
-    let file = new File([audioBlob], "recordingFile.webm", {
-        type: "video/webm",
-        lastModified: new Date().getTime()
-    });
-    container.items.add(file);
+                // Create the Recorder object and configure to record mono sound (1 channel) Recording 2 channels will double the file size
+                rec = new Recorder(input, { numChannels: 2 })
 
-    fileInputElement.files = container.files;
-}
+                //start the recording process
+                rec.record()
 
-  startButton.addEventListener('click', startRecording);
-  stopButton.addEventListener('click', stopRecording);
+                console.log("Recording started");
 
-</script>
+            }).catch(function (err) {
+                alert(`error: ${err.name}: ${err.message}`);
+                startButton.disabled = false
+                stopButton.disabled = true;
+            });
+        }
+
+        function stopRecording() {
+            try {
+                console.log("stopButton clicked");
+
+                //disable the stop button, enable the record too allow for new recordings
+                startButton.disabled = false;
+                stopButton.disabled = true;
+                uploadButton.disabled = false;
+
+                //tell the recorder to stop the recording
+                rec.stop(); //stop microphone access
+                gumStream.getAudioTracks()[0].stop();
+
+                //create the wav blob and pass it on to createDownloadLink
+                rec.exportWAV(createDownloadLink);
+
+                // Blob 데이터에 접근할 수 있는 주소를 생성한다.
+                // const audioUrl = URL.createObjectURL(audioBlob);
+
+                // audio 엘리먼트로 재생한다.
+                // audioElement.src = audioUrl;
+
+            } catch (err) {
+                alert(`error: ${err.name}: ${err.message}`);
+            }
+        }
+
+        function createDownloadLink(blob) {
+            audioBlob = blob;
+            var url = URL.createObjectURL(blob);
+
+            //add controls to the <audio> element
+            audioElement.controls = true;
+            audioElement.src = url;
+        }
+
+        function setBlob() {
+            let fileInputElement = document.getElementById('file_input');
+            let container = new DataTransfer();
+            let file = new File([audioBlob], "recordingFile.wav", {
+                type: "audio/wav",
+                lastModified: new Date().getTime()
+            });
+            container.items.add(file);
+
+            fileInputElement.files = container.files;
+        }
+
+        startButton.addEventListener('click', startRecording);
+        stopButton.addEventListener('click', stopRecording);
+
+    </script>
 </body>
 </html>
