@@ -189,18 +189,12 @@
                 stopButton.disabled = true;
                 uploadButton.disabled = false;
 
-                //tell the recorder to stop the recording
+                // tell the recorder to stop the recording
                 rec.stop(); //stop microphone access
                 gumStream.getAudioTracks()[0].stop();
 
                 //create the wav blob and pass it on to createDownloadLink
                 rec.exportWAV(createDownloadLink);
-
-                // Blob 데이터에 접근할 수 있는 주소를 생성한다.
-                // const audioUrl = URL.createObjectURL(audioBlob);
-
-                // audio 엘리먼트로 재생한다.
-                // audioElement.src = audioUrl;
 
             } catch (err) {
                 alert(`error: ${err.name}: ${err.message}`);
