@@ -10,119 +10,124 @@
 </head>
 
 <body>
-    <div class="container my-5">
-        <h1 class="mb-5">Process Audio</h1>
+<div class="container my-5">
+    <h1 class="mb-5">Process Audio</h1>
 
-        <form method="post" id="upload_form" enctype="multipart/form-data" class="my-5">
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-sm-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Upload Audio</h5>
-                            <!--오디오 파일 업로드-->
-                            <div class="form-group my-5" name="original_audio" id="original_audio">
-                                <input type="file" id="file_input" name="{{ form.original_audio.name }}"
-                                    accept="audio/wav" />
-                            </div>
-                            <!--오디오 파일 업로드 끝-->
+    <button type="button" class="btn btn-secondary" id="audioOnly">audio only</button>
+    <button type="button" class="btn btn-secondary" id="textOnly">text only</button>
+    <button type="button" class="btn btn-secondary" id="audioAndText">audio and text</button>
+
+    <form method="post" id="upload_form" enctype="multipart/form-data" class="my-5">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Upload Audio</h5>
+                        <!--오디오 파일 업로드-->
+                        <div class="form-group my-5" name="original_audio" id="original_audio">
+                            <input type="file" id="file_input" name="{{ form.original_audio.name }}"
+                                   accept="audio/wav"/>
                         </div>
+                        <!--오디오 파일 업로드 끝-->
                     </div>
                 </div>
-                <div class="col-sm-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Record Audio</h5>
-                            <!--녹음-->
-                            <div class="my-5">
-                                <button type="button" class="btn btn-success" id="recordingStart">Start Recording
-                                </button>
-                                <button type="button" class="btn btn-danger" id="recordingStop" disabled>Stop Recording
-                                </button>
-                                <button type="button" class="btn btn-primary" id="recordingUpload" onclick="setBlob()"
+            </div>
+            <div class="col-sm-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Record Audio</h5>
+                        <!--녹음-->
+                        <div class="my-5">
+                            <button type="button" class="btn btn-success" id="recordingStart">Start Recording
+                            </button>
+                            <button type="button" class="btn btn-danger" id="recordingStop" disabled>Stop Recording
+                            </button>
+                            <button type="button" class="btn btn-primary" id="recordingUpload" onclick="setBlob()"
                                     disabled>Upload
-                                </button>
+                            </button>
 
-                                <audio id="playAudio" controls class="w-100 mt-3" style=""></audio>
-                            </div>
-                            <!--녹음 끝-->
+                            <audio id="playAudio" controls class="w-100 mt-3" style=""></audio>
                         </div>
+                        <!--녹음 끝-->
                     </div>
                 </div>
-                <div class="col-sm-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">Enter Text</h5>
-                            <!-- Text 입력 폼 -->
-                            <div class="form-group my-5" id="textForm">
+            </div>
+            <div class="col-sm-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Enter Text</h5>
+                        <!-- Text 입력 폼 -->
+                        <div class="form-group my-5" id="textForm">
                                 <textarea class="form-control" name="original_text" id="original_text" rows="3"
-                                    placeholder="Enter text here..."></textarea>
-                            </div>
-                            <!-- Text 입력 폼 끝 -->
+                                          placeholder="Enter text here..."></textarea>
                         </div>
+                        <!-- Text 입력 폼 끝 -->
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary mt-3">Input</button>
-        </form>
-
-        <!-- 구분선 -->
-        <hr class="mb-5">
-        <!-- 구분선 끝 -->
-
-        <!--원본 오디오 재생-->
-        {% if audio_data.original_audio %}
-        <div class="card mb-4">
-            <div class="card-body">
-                <h2 class="card-title">Original Audio</h2>
-                <audio controls>
-                    <source src="{{ audio_data.original_audio.url }}" type="audio/wav">
-                    Your browser does not support the audio element.
-                </audio>
-            </div>
         </div>
-        {% endif %}
-        <!--원본 오디오 재생 끝-->
+        <button type="submit" class="btn btn-primary mt-3" onclick="return checkForm()">Input</button>
+    </form>
 
-        <!--원본 텍스트-->
-        {% if audio_data.original_text %}
-        <div class="card mb-4">
-            <div class="card-body">
-                <h2 class="card-title">Original Text</h2>
-                <p class="card-text">{{ audio_data.original_text }}</p>
-            </div>
-        </div>
-        {% endif %}
-        <!--원본 텍스트 끝-->
+    <!-- 구분선 -->
+    <hr class="mb-5">
+    <!-- 구분선 끝 -->
 
-        <!--가공 후 오디오 재생-->
-        <div class="card mb-4">
-            <div class="card-body">
-                <h2 class="card-title">Processed Audio</h2>
-                <audio controls>
-                    <source src="{{ audio_data.processed_audio.url }}" type="audio/wav">
-                    Your browser does not support the audio element.
-                </audio>
-            </div>
+    {% if audio_data %}
+    <!--원본 오디오 재생-->
+    {% if audio_data.original_audio %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Original Audio</h2>
+            <audio controls>
+                <source src="{{ audio_data.original_audio.url }}" type="audio/wav">
+                Your browser does not support the audio element.
+            </audio>
         </div>
-        <!--가공 후 오디오 끝-->
-
-        <!--가공 후 텍스트-->
-        {% if audio_data.processed_text %}
-        <div class="card mb-4">
-            <div class="card-body">
-                <h2 class="card-title">Processed Text</h2>
-                <p class="card-text">{{ audio_data.processed_text }}</p>
-            </div>
-        </div>
-        {% endif %}
-        <!--가공 후 텍스트 끝-->
     </div>
+    {% endif %}
+    <!--원본 오디오 재생 끝-->
 
-    <script src="{% static 'bootstrap.min.js' %}"></script>
-    <script src="{% static 'recorder.js' %}"></script>
-    <script>
-        //
+    <!--원본 텍스트-->
+    {% if audio_data.original_text %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Original Text</h2>
+            <p class="card-text">{{ audio_data.original_text }}</p>
+        </div>
+    </div>
+    {% endif %}
+    <!--원본 텍스트 끝-->
+
+    <!--가공 후 오디오 재생-->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Processed Audio</h2>
+            <audio controls>
+                <source src="{{ audio_data.processed_audio.url }}" type="audio/wav">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    </div>
+    <!--가공 후 오디오 끝-->
+
+    <!--가공 후 텍스트-->
+    {% if audio_data.processed_text %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Processed Text</h2>
+            <p class="card-text">{{ audio_data.processed_text }}</p>
+        </div>
+    </div>
+    {% endif %}
+    <!--가공 후 텍스트 끝-->
+    {% endif %}
+</div>
+
+<script src="{% static 'bootstrap.min.js' %}"></script>
+<script src="{% static 'recorder.js' %}"></script>
+<script>
         //webkitURL is deprecated but nevertheless
         URL = window.URL || window.webkitURL;
 
@@ -226,6 +231,65 @@
         startButton.addEventListener('click', startRecording);
         stopButton.addEventListener('click', stopRecording);
 
-    </script>
+</script>
+
+<script>
+    const audioOnlyButton = document.getElementById('audioOnly');
+    const textOnlyButton = document.getElementById('textOnly');
+    const audioAndTextButton = document.getElementById('audioAndText');
+
+    const audioSection = document.getElementById('original_audio').parentNode.parentNode.parentNode;
+    const recordSection = document.getElementById('recordingStart').parentNode.parentNode.parentNode;
+    const textSection = document.getElementById('textForm').parentNode.parentNode.parentNode;
+
+    const audioInput = document.getElementById('file_input');
+    const text = document.getElementById('original_text');
+
+    audioSection.style.display = 'none';
+    recordSection.style.display = 'none';
+    textSection.style.display = 'none';
+
+    audioOnlyButton.addEventListener('click', function () {
+        audioSection.style.display = 'block';
+        recordSection.style.display = 'block';
+        textSection.style.display = 'none';
+    });
+
+    textOnlyButton.addEventListener('click', function () {
+        audioSection.style.display = 'none';
+        recordSection.style.display = 'none';
+        textSection.style.display = 'block';
+    });
+
+    audioAndTextButton.addEventListener('click', function () {
+        audioSection.style.display = 'block';
+        recordSection.style.display = 'block';
+        textSection.style.display = 'block';
+    });
+
+    function checkForm() {
+        if (!audioInput.files[0] && !text.value.trim()) {
+            alert('폼 확인 후 다시 제출 해주세요.');
+            return false;
+        }
+        if (audioSection.style.display === 'block' && textSection.style.display === 'block') {
+            if (!audioInput.files[0] || !text.value.trim()) {
+                alert('오디오 파일 업로드 및 텍스트를 입력해 주세요.');
+                return false;
+            }
+        } else if (audioSection.style.display === 'block' && recordSection.style.display === 'block') {
+            if (!audioInput.files[0]) {
+                alert('오디오 파일을 업로드 해주세요.');
+                return false;
+            }
+        } else if (audioSection.style.display !== 'block' && textSection.style.display === 'block') {
+            if (!text.value.trim()) {
+                alert('텍스트를 입력해 주세요.');
+                return false;
+            }
+        }
+    }
+
+</script>
 </body>
 </html>

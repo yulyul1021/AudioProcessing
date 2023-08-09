@@ -16,7 +16,7 @@ def index(request):
                 audio_file = request.FILES['original_audio']
 
                 # 한국어 음성 -> 텍스트 변환
-                kr_text = audio_data.original_text  # 녹음된 파일일시 해당 함수에서 오류
+                kr_text = audio_data.original_text
 
                 # 한 -> 영 텍스트 번역
                 en_text = text_translate(kr_text)
@@ -37,7 +37,8 @@ def index(request):
                 audio_file = request.FILES['original_audio']
 
                 # 한국어 음성 -> 텍스트 변환
-                kr_text = audio_to_text(audio_file)  # 녹음된 파일일시 해당 함수에서 오류
+                kr_text = audio_to_text(audio_file)
+
                 audio_data.original_text = kr_text
 
                 # 한 -> 영 텍스트 번역
@@ -54,7 +55,7 @@ def index(request):
                 # processed file rename
                 rename_audio_file(audio_data.pk, audio_data.processed_audio, 'processed')
 
-            else:
+            elif not request.FILES.get('original_audio'):
                 # 텍스트만 input -> 번역 -> tts
                 kr_text = audio_data.original_text
 

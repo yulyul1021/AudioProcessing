@@ -15,7 +15,7 @@ def audio_to_text(audio):
     """
     r = sr.Recognizer()
     read_audio = sr.AudioFile(audio)
-    with read_audio as source:  # 녹음 wav일시 오류
+    with read_audio as source:
         f = r.record(source)
     out_text = r.recognize_google(f, language="ko-KR")
     return out_text
