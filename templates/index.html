@@ -23,13 +23,21 @@
             <div class="col-sm-4">
                 <div class="card h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Upload Audio</h5>
                         <!--오디오 파일 업로드-->
-                        <div class="form-group my-5" name="original_audio" id="original_audio">
+                        <h5 class="card-title">Upload Audio</h5>
+                        <div class="form-group my-4" name="original_audio" id="original_audio">
                             <input type="file" id="file_input" name="{{ form.original_audio.name }}"
                                    accept="audio/wav"/>
                         </div>
                         <!--오디오 파일 업로드 끝-->
+                        <hr class="hr"/>
+                        <!--비디오 파일 업로드-->
+                        <h5 class="card-title">Upload Video(MP4)</h5>
+                        <div class="form-group my-4" name="original_video" id="original_video">
+                            <input type="file" id="video_file_input" name="{{ form.original_video.name }}"
+                                   accept="video/mp4"/>
+                        </div> <!--비디오 오디오 둘다 input 못하게 막기-->
+                        <!--비디오 파일 업로드 끝-->
                     </div>
                 </div>
             </div>
@@ -221,6 +229,7 @@
         startButton.addEventListener('click', startRecording);
         stopButton.addEventListener('click', stopRecording);
 
+
 </script>
 
 <script>
@@ -233,6 +242,7 @@
     const textSection = document.getElementById('textForm').parentNode.parentNode.parentNode;
 
     const audioInput = document.getElementById('file_input');
+    const videoInput = document.getElementById('video_file_input');
     const text = document.getElementById('original_text');
 
     audioSection.style.display = 'none';
@@ -259,7 +269,7 @@
     });
 
     function checkForm() {
-        if (!audioInput.files[0] && !text.value.trim()) {
+        if (!audioInput.files[0] && !videoInput.files[0] && !text.value.trim()) {
             alert('폼 확인 후 다시 제출 해주세요.');
             return false;
         }
@@ -269,7 +279,7 @@
                 return false;
             }
         } else if (audioSection.style.display === 'block' && recordSection.style.display === 'block') {
-            if (!audioInput.files[0]) {
+            if (!videoInput.files[0] && !audioInput.files[0]) {
                 alert('오디오 파일을 업로드 해주세요.');
                 return false;
             }
@@ -280,6 +290,7 @@
             }
         }
     }
+
 
 </script>
 </body>

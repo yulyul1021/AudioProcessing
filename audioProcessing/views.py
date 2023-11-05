@@ -11,8 +11,15 @@ def index(request):
             audio_data = form.save(commit=False)
             audio_data.create_date = timezone.now()
 
+            if request.FILES.get('original_video'):
+                # video input
+                video_file = request.FILES['original_video']
+                wav_file = mp4_to_wav(video_file)
+                request.FILES['original_audio'] = wav_file
+                # TODO 비디오 wav로 변환 -> 오디오로 넘기기
+
             if request.FILES.get('original_audio') and request.POST.get('original_text'):
-                # 나중에 수정하기
+                # 오디오, 텍스트 둘 다 입력 / 나중에 수정하기
                 audio_file = request.FILES['original_audio']
 
                 # 한국어 음성 -> 텍스트 변환
