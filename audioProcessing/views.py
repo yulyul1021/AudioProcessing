@@ -2,6 +2,8 @@ from django.shortcuts import render
 from .forms import AudioForm
 from django.utils import timezone
 from .utils import *
+from .utils import WebRTCVAD
+from .models import AudioData
 
 
 def index(request):
@@ -18,6 +20,33 @@ def index(request):
                 request.FILES['original_audio'] = wav_file
                 # TODO 비디오 wav로 변환 -> 오디오로 넘기기
 
+            if request.FILES.get('original_audio'):  # 오디오만 input
+                audio_file = request.FILES['original_audio']
+
+                vad = WebRTCVAD()
+                num_audios, onsets, offsets, crop_audios = vad.detect_endpoints(audio_file)
+
+                google_sr = SpeechRecognition()
+                texts = google_sr.recognize_korean(num_audios=num_audios)
+
+                for i in range(num_audios):
+                    kr_text = texts[i]
+                    en_text = text_translate(kr_text)
+                    tts_file = text_to_tts(en_text)
+
+                    tmp = AudioData(create_date=audio_data.create_date, original_audio=audio_file,
+                                    original_text=kr_text, processed_text=en_text,
+                                    onset=onsets[i], offset=offsets[i])
+
+                    print(audio_file.name)
+                    print(tts_file)
+                    tmp.processed_audio.save(audio_file.name, tts_file)
+                    rename_audio_file(tmp.pk, tmp.original_audio, 'original')
+                    rename_audio_file(tmp.pk, tmp.processed_audio, 'processed')
+
+                    tmp.save()
+
+            '''
             if request.FILES.get('original_audio') and request.POST.get('original_text'):
                 # 오디오, 텍스트 둘 다 입력 / 나중에 수정하기
                 audio_file = request.FILES['original_audio']
@@ -76,8 +105,10 @@ def index(request):
 
                 # processed file rename
                 rename_audio_file(audio_data.pk, audio_data.processed_audio, 'processed')
+            '''
 
-            audio_data.save()
+            # audio_data.save()
+            audio_data = AudioData.objects.filter(create_date=audio_data.create_date)
             context = {'form': form, 'audio_data': audio_data}
             return render(request, 'index.html', context)
     else:

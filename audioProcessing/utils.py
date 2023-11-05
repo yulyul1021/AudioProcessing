@@ -181,3 +181,23 @@ class WebRTCVAD:
     def create_folder(self, dir_name):
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
+
+
+#################################################################################
+#################################################################################
+import speech_recognition as sr
+
+
+class SpeechRecognition:
+    def __init__(self):
+        self.r = sr.Recognizer()
+
+    def recognize_korean(self, num_audios):
+        dir_name = "tmp"
+        texts = []
+        for i in range(num_audios):
+            with sr.AudioFile(f"{dir_name}/{i:04}.wav") as source:
+                audio = self.r.record(source)
+                texts.append(self.r.recognize_google(audio, language='ko-KR'))
+
+        return texts

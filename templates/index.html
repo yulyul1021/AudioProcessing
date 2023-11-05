@@ -82,14 +82,14 @@
     <hr class="mb-5">
     <!-- 구분선 끝 -->
 
-    {% if audio_data %}
+    {% if audio_data.0 %}
     <!--원본 오디오 재생-->
-    {% if audio_data.original_audio %}
+    {% if audio_data.0.original_audio %}
     <div class="card mb-4">
         <div class="card-body">
             <h2 class="card-title">Original Audio</h2>
             <audio controls>
-                <source src="{{ audio_data.original_audio.url }}" type="audio/wav">
+                <source src="{{ audio_data.0.original_audio.url }}" type="audio/wav">
                 Your browser does not support the audio element.
             </audio>
         </div>
@@ -98,27 +98,36 @@
     <!--원본 오디오 재생 끝-->
 
     <!--원본 텍스트-->
-    {% if audio_data.original_text %}
+    {% if audio_data.0.original_text %}
     <div class="card mb-4">
         <div class="card-body">
-            <h2 class="card-title">Original Text</h2>
-            <p class="card-text">{{ audio_data.original_text }}</p>
+            <h2 class="card-title mb-3">Original Text</h2>
+            {% for data in audio_data %}
+            <p class="card-text">{{ data.original_text }}</p>
+            {% endfor %}
         </div>
     </div>
     {% endif %}
     <!--원본 텍스트 끝-->
 
+    <!-- 구분선 -->
+    <hr class="mb-5">
+    <!-- 구분선 끝 -->
+
+    {% for data in audio_data %}
     <!--가공 후 오디오 재생-->
     <div class="card mb-4">
         <div class="card-body">
-            <h2 class="card-title">Processed Audio</h2>
+            <h2 class="card-title">Processed</h2>
+            <p class="card-text">{{ data.processed_text }}</p>
             <audio controls>
-                <source src="{{ audio_data.processed_audio.url }}" type="audio/wav">
+                <source src="{{ data.processed_audio.url }}" type="audio/wav">
                 Your browser does not support the audio element.
             </audio>
         </div>
     </div>
     <!--가공 후 오디오 끝-->
+    {% endfor %}
 
     <!--가공 후 텍스트-->
     {% if audio_data.processed_text %}

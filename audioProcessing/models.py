@@ -9,5 +9,5 @@ class AudioData(models.Model):
     original_text = models.TextField(blank=True)
     processed_text = models.TextField(blank=True)
     processed_audio = models.FileField(upload_to='audio/processed/')
-    onset = models.FloatField()
-    offset = models.FloatField()
+    onset = models.FloatField(blank=True)
+    offset = models.FloatField(blank=True)
