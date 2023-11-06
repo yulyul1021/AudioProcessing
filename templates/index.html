@@ -87,7 +87,7 @@
     {% if audio_data.0.original_audio %}
     <div class="card mb-4">
         <div class="card-body">
-            <h2 class="card-title">Original Audio</h2>
+            <h3 class="card-title">Original Audio</h3>
             <audio controls>
                 <source src="{{ audio_data.0.original_audio.url }}" type="audio/wav">
                 Your browser does not support the audio element.
@@ -101,7 +101,7 @@
     {% if audio_data.0.original_text %}
     <div class="card mb-4">
         <div class="card-body">
-            <h2 class="card-title mb-3">Original Text</h2>
+            <h3 class="card-title mb-3">Original Text</h3>
             {% for data in audio_data %}
             <p class="card-text">{{ data.original_text }}</p>
             {% endfor %}
@@ -118,7 +118,10 @@
     <!--가공 후 오디오 재생-->
     <div class="card mb-4">
         <div class="card-body">
-            <h2 class="card-title">Processed</h2>
+            <h3 class="card-title">Processed</h3>
+            {% if data.onset %}
+            <small>onset: {{ data.onset }} / offset: {{ data.offset }}</small>
+            {% endif %}
             <p class="card-text">{{ data.processed_text }}</p>
             <audio controls>
                 <source src="{{ data.processed_audio.url }}" type="audio/wav">
@@ -129,15 +132,15 @@
     <!--가공 후 오디오 끝-->
     {% endfor %}
 
-    <!--가공 후 텍스트-->
+    <!--가공 후 텍스트
     {% if audio_data.processed_text %}
     <div class="card mb-4">
         <div class="card-body">
-            <h2 class="card-title">Processed Text</h2>
+            <h3 class="card-title">Processed Text</h3>
             <p class="card-text">{{ audio_data.processed_text }}</p>
         </div>
     </div>
-    {% endif %}
+    {% endif %}-->
     <!--가공 후 텍스트 끝-->
     {% endif %}
 </div>

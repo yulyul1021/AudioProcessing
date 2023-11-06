@@ -38,13 +38,12 @@ def index(request):
                                     original_text=kr_text, processed_text=en_text,
                                     onset=onsets[i], offset=offsets[i])
 
-                    print(audio_file.name)
-                    print(tts_file)
                     tmp.processed_audio.save(audio_file.name, tts_file)
                     rename_audio_file(tmp.pk, tmp.original_audio, 'original')
                     rename_audio_file(tmp.pk, tmp.processed_audio, 'processed')
 
                     tmp.save()
+
 
             '''
             if request.FILES.get('original_audio') and request.POST.get('original_text'):
@@ -90,8 +89,9 @@ def index(request):
 
                 # processed file rename
                 rename_audio_file(audio_data.pk, audio_data.processed_audio, 'processed')
+                '''
 
-            elif not request.FILES.get('original_audio'):
+            if not request.FILES.get('original_audio'):
                 # 텍스트만 input -> 번역 -> tts
                 kr_text = audio_data.original_text
 
@@ -105,9 +105,8 @@ def index(request):
 
                 # processed file rename
                 rename_audio_file(audio_data.pk, audio_data.processed_audio, 'processed')
-            '''
+                audio_data.save()
 
-            # audio_data.save()
             audio_data = AudioData.objects.filter(create_date=audio_data.create_date)
             context = {'form': form, 'audio_data': audio_data}
             return render(request, 'index.html', context)
