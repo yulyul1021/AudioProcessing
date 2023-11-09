@@ -4,6 +4,7 @@ from django.utils import timezone
 from .utils import *
 from .utils import WebRTCVAD
 from .models import AudioData
+import shutil
 
 
 def index(request):
@@ -29,6 +30,8 @@ def index(request):
                 google_sr = SpeechRecognition()
                 texts = google_sr.recognize_korean(num_audios=num_audios)
 
+                tmp_field = ""
+
                 for i in range(num_audios):
                     kr_text = texts[i]
                     en_text = text_translate(kr_text)
@@ -39,9 +42,15 @@ def index(request):
                                     onset=onsets[i], offset=offsets[i])
 
                     tmp.processed_audio.save(audio_file.name, tts_file)
-                    rename_audio_file(tmp.pk, tmp.original_audio, 'original')
+
+                    if i == 0:
+                        rename_audio_file(tmp.pk, tmp.original_audio, 'original')
+                        tmp_field = tmp.original_audio
+
+                    shutil.move(tmp.original_audio.path, tmp_field.path)  # 덮어쓰기
                     rename_audio_file(tmp.pk, tmp.processed_audio, 'processed')
 
+                    tmp.original_audio = tmp_field
                     tmp.save()
 
 
