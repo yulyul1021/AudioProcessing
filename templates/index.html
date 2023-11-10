@@ -79,11 +79,12 @@
     </form>
 
     <!-- 구분선 -->
-    <hr class="mb-5">
+    <hr class="m3-5">
     <!-- 구분선 끝 -->
 
+
     {% if audio_data.0 %}
-    <!--원본 오디오 재생-->
+    <!--원본 오디오 재생
     {% if audio_data.0.original_audio %}
     <div class="card mb-4">
         <div class="card-body">
@@ -95,9 +96,9 @@
         </div>
     </div>
     {% endif %}
-    <!--원본 오디오 재생 끝-->
+    원본 오디오 재생 끝-->
 
-    <!--원본 텍스트-->
+    <!--원본 텍스트
     {% if audio_data.0.original_text %}
     <div class="card mb-4">
         <div class="card-body">
@@ -108,20 +109,27 @@
         </div>
     </div>
     {% endif %}
-    <!--원본 텍스트 끝-->
+    원본 텍스트 끝-->
 
-    <!-- 구분선 -->
-    <hr class="mb-5">
-    <!-- 구분선 끝 -->
+    <!-- 구분선
+    <hr class="my-5">
+    구분선 끝 -->
+
+    <h2 class="mb-4">Processed</h2>
 
     {% for data in audio_data %}
     <!--가공 후 오디오 재생-->
     <div class="card mb-4">
         <div class="card-body">
-            <h3 class="card-title">Processed</h3>
             {% if data.onset %}
-            <small>onset: {{ data.onset }} / offset: {{ data.offset }}</small>
+            <small class="mb-1">onset: {{ data.onset }} / offset: {{ data.offset }}</small>
             {% endif %}
+            <p class="card-text">{{ data.original_text }}</p>
+            <audio controls>
+                <source src="{{ data.original_audio.url }}" type="audio/wav">
+                Your browser does not support the audio element.
+            </audio>
+            <hr class="my-2">
             <p class="card-text">{{ data.processed_text }}</p>
             <audio controls>
                 <source src="{{ data.processed_audio.url }}" type="audio/wav">

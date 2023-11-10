@@ -7,6 +7,7 @@ from gtts import gTTS
 
 
 def mp4_to_wav(mp4_file):
+    # TODO
     return mp4_file
 
 
@@ -113,8 +114,9 @@ class WebRTCVAD:
         onsets, offsets = self.smoothing_vad(onsets, offsets)
         crop_audios = self.crop_audio(onsets, offsets, samples)
         num_audios = self.write_audio(crop_audios)
+        wav_audios = self.create_wav(crop_audios)
 
-        return num_audios, onsets, offsets, crop_audios
+        return num_audios, onsets, offsets, crop_audios, wav_audios
 
     def calc_vad(self, segments):
         onsets, offsets = [], []
@@ -177,6 +179,17 @@ class WebRTCVAD:
             wavfile.write(filename, self.sample_rate, audios[i])
 
         return num_audios
+
+    def create_wav(self, audios):
+        num_audios = len(audios)
+        wav_audios = []
+
+        for i in range(num_audios):
+            buffer = io.BytesIO()
+            wavfile.write(buffer, self.sample_rate, audios[i])
+            wav_audios.append(buffer)
+
+        return wav_audios
 
     def create_folder(self, dir_name):
         if not os.path.exists(dir_name):

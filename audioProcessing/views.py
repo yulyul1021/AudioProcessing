@@ -2,9 +2,8 @@ from django.shortcuts import render
 from .forms import AudioForm
 from django.utils import timezone
 from .utils import *
-from .utils import WebRTCVAD
 from .models import AudioData
-import shutil
+import soundfile as sf
 
 
 def index(request):
@@ -25,32 +24,25 @@ def index(request):
                 audio_file = request.FILES['original_audio']
 
                 vad = WebRTCVAD()
-                num_audios, onsets, offsets, crop_audios = vad.detect_endpoints(audio_file)
+                num_audios, onsets, offsets, crop_audios, wav_audios = vad.detect_endpoints(audio_file)
 
                 google_sr = SpeechRecognition()
                 texts = google_sr.recognize_korean(num_audios=num_audios)
-
-                tmp_field = ""
 
                 for i in range(num_audios):
                     kr_text = texts[i]
                     en_text = text_translate(kr_text)
                     tts_file = text_to_tts(en_text)
 
-                    tmp = AudioData(create_date=audio_data.create_date, original_audio=audio_file,
+                    tmp = AudioData(create_date=audio_data.create_date,
                                     original_text=kr_text, processed_text=en_text,
                                     onset=onsets[i], offset=offsets[i])
 
+                    tmp.original_audio.save(audio_file.name, wav_audios[i])
+                    rename_audio_file(tmp.pk, tmp.original_audio, 'original')
                     tmp.processed_audio.save(audio_file.name, tts_file)
-
-                    if i == 0:
-                        rename_audio_file(tmp.pk, tmp.original_audio, 'original')
-                        tmp_field = tmp.original_audio
-
-                    shutil.move(tmp.original_audio.path, tmp_field.path)  # 덮어쓰기
                     rename_audio_file(tmp.pk, tmp.processed_audio, 'processed')
 
-                    tmp.original_audio = tmp_field
                     tmp.save()
 
 
